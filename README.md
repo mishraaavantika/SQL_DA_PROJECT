@@ -28,9 +28,49 @@ FROM
 
 ## 4.	EDA (with questions)
 The exploration of the Dataset includes variuos questions that we intend to solve that are attched in the file "QUESTION.TXT".
+Some of the exploration question looks like:
+
+### 1. Identify the most common pizza size ordered.
+--> This uses the basic style of SQL query to identify the most common pizza size ordered from the pizza table and pizza_type table. 
+
+### 2. Determine the top 3 most ordered pizza types based on revenue
+--> The top 3 most ordered pizzas are queried by joining two tables that are pizza and pizza_type that is joined y the pizza__type_id and the revenue is taken from the orders table by joining it with the pizzas table on the common column of pizza_id.
+
+```
+SQL
+    SELECT 
+    pizza_types.name,
+    SUM(order_details.quantity * pizzas.price) AS revenue
+FROM
+    pizza_types
+        JOIN
+    pizzas ON pizza_types.pizza_type_id = pizzas.pizza_type_id
+        JOIN
+    order_details ON pizzas.pizza_id = order_details.pizza_id
+GROUP BY pizza_types.name
+ORDER BY revenue DESC
+LIMIT 3;
+```  
+
+### 3. Analyze the cumulative revenue generated over time.
+
+```
+SQL
+select order_date, 
+sum(revenue) over (order by order_date) as cumulative_revenue
+from 
+(select orders.order_date, 
+sum(order_details.quantity * pizzas.price) as revenue
+from order_details join pizzas
+on order_details.pizza_id=pizzas.pizza_id
+join orders
+on orders.order_id=order_details.order_id
+group by orders.order_date) as sales;
+```
 
 ## 5.	Limitations(zero/null values, outliers)
 Cannot handle very large datasets for which we might need to use some other way to analyse like Excel that can handle very large datasets.  
+
 
 
 
